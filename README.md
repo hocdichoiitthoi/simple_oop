@@ -34,5 +34,3 @@ Files produced are saved under `output/` (e.g. `sepal.length_histogram.png`, `pa
 ## License
 Choose and add a license file (e.g., `LICENSE`) if you plan to publish the repository publicly.
 
----
-If you want, I can commit this README and push it to your repository for you.
