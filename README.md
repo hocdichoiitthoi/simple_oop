@@ -1,3 +1,24 @@
+# Titanic ML pipeline
+
+Run a simple ML pipeline that loads the Titanic dataset from `seaborn`, performs cleaning and feature engineering (age bins, cabin letter, family size), trains three models (Logistic Regression, Random Forest, XGBoost or sklearn fallback), and saves confusion matrix plots to `src/output`.
+
+Setup (create a virtual environment recommended):
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+Run the pipeline:
+
+```powershell
+python src/titanic_pipeline.py
+```
+
+Outputs:
+- Accuracy printed for each model
+- Confusion matrix PNGs saved in `src/output`
 # simple-example
 
 A small Python example project demonstrating a DatasetProfiler class that loads a CSV, prints a numerical summary, and saves plots (histograms, boxplots, pairplot) to `output/`.
