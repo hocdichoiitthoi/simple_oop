@@ -86,10 +86,10 @@ class DatasetProfiler:
 
         g = sns.pairplot(self.df, hue='variety')
         # pairplot returns a PairGrid; set the suptitle on its figure
-        g.fig.suptitle('Pairplot of Iris Features by Variety', y=1.02)
+        g.figure.suptitle('Pairplot of Iris Features by Variety', y=1.02)
         filepath = Path(self.output_dir) / "pairplot.png"
-        g.fig.savefig(filepath, bbox_inches="tight")
-        plt.close(g.fig)
+        g.figure.savefig(filepath, bbox_inches="tight")
+        plt.close(g.figure)
         print(f"Saved pairplot to {filepath}")
         
 

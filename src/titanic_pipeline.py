@@ -14,32 +14,24 @@ from sklearn.compose import ColumnTransformer
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier
 from sklearn.metrics import accuracy_score, confusion_matrix
-
+from xgboost import XGBClassifier
 
 class TitanicPipeline:
     def __init__(self, output_dir: str | Path | None = None, random_state: int = 42):
         self.df = None
         self.random_state = random_state
         if output_dir is None:
-            output_dir = Path(__file__).parent / "output"
+            output_dir = Path(__file__).parent / "week2_output"
         self.output_dir = Path(output_dir)
         os.makedirs(self.output_dir, exist_ok=True)
-
-    def load_data(self, file_path: str | Path | None = None) -> pd.DataFrame:
-        if file_path is None:
-            self.df = sns.load_dataset("titanic")
-            return self.df
-
+    
+    def load_data(self, file_path: str | Path ) -> pd.DataFrame:
         file_path = Path(file_path)
         self.df = pd.read_csv(file_path)
         return self.df
-
+        
     def clean_and_engineer(self, df: pd.DataFrame) -> pd.DataFrame:
         df = df.copy()
-
-        # Ensure expected columns exist
-        if "cabin" not in df.columns:
-            df["cabin"] = np.nan
 
         cols = [
             "survived",
@@ -60,7 +52,7 @@ class TitanicPipeline:
         df["family_size"] = df["sibsp"].fillna(0) + df["parch"].fillna(0) + 1
         df["cabin_letter"] = df["cabin"].fillna("U").astype(str).str[0]
 
-        bins = [0, 12, 18, 35, 60, 120]
+        bins = [0, 12, 18, 35, 60, 100]
         labels = ["child", "teen", "young_adult", "adult", "senior"]
         df["age_bin"] = pd.cut(df["age"], bins=bins, labels=labels)
 
@@ -93,20 +85,11 @@ class TitanicPipeline:
         return X_train, X_test, y_train, y_test, preprocessor
 
     def train_and_evaluate(self, X_train, X_test, y_train, y_test, preprocessor):
-        # Try to import XGBoost, fallback to sklearn HGB if not available
-        try:
-            from xgboost import XGBClassifier
-
-            xgb_model = XGBClassifier(use_label_encoder=False, eval_metric="logloss", random_state=self.random_state)
-            xgb_name = "XGBoost"
-        except Exception:
-            xgb_model = HistGradientBoostingClassifier(random_state=self.random_state)
-            xgb_name = "XGBoost (sklearn HGB fallback)"
-
+    
         models = {
-            "Logistic Regression": LogisticRegression(max_iter=2000),
-            "Random Forest": RandomForestClassifier(n_estimators=200, random_state=self.random_state),
-            xgb_name: xgb_model,
+            "Logistic Regression": LogisticRegression(random_state=self.random_state),
+            "Random Forest": RandomForestClassifier(max_depth=7, n_estimators=500, min_samples_split=5, random_state=self.random_state),
+            "XGBClassifier": XGBClassifier(n_estimators=6, eval_metric="logloss", random_state=self.random_state),
         }
 
         X_train_proc = preprocessor.fit_transform(X_train)
@@ -136,8 +119,9 @@ class TitanicPipeline:
 
         return results
 
-    def run(self, file_path: str | Path | None = None):
-        df = self.load_data(file_path)
+    def run(self):
+        data_file = Path(__file__).parent / "files" / "titanic.csv"
+        df = self.load_data(data_file)
         print(df.head())
         df = self.clean_and_engineer(df)
         print("---------------------------------------------")
@@ -156,7 +140,6 @@ class TitanicPipeline:
 def main():
     pipeline = TitanicPipeline()
     pipeline.run()
-
 
 if __name__ == "__main__":
     main()
