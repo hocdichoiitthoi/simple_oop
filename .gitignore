@@ -46,3 +46,7 @@ htmlcov/
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
+
+data/
+*.tar.gz
+*.zip
